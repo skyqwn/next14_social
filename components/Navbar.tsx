@@ -18,6 +18,9 @@ import { FaRegUser } from "react-icons/fa6";
 import { IoPeopleOutline } from "react-icons/io5";
 import { AiOutlineMessage } from "react-icons/ai";
 import { IoNotificationsOutline } from "react-icons/io5";
+import { CiSearch } from "react-icons/ci";
+
+import { Input } from "./ui/input";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -53,7 +56,7 @@ const Navbar = () => {
         </Link>
       </section>
       {/* CENTER */}
-      <section className="hidden md:flex w-[50%]">
+      <section className="hidden md:flex w-[50%] text-sm items-center justify-between">
         <div className="flex gap-6 text-gray-600 items-center justify-between">
           {routes.map((route) => {
             return (
@@ -70,6 +73,14 @@ const Navbar = () => {
               </Link>
             );
           })}
+        </div>
+        <div className="hidden xl:flex p-2 bg-slate-100 items-center rouded-xl">
+          <input
+            type="text"
+            placeholder="search..."
+            className="bg-transparent outline-none"
+          />
+          <CiSearch size={20} />
         </div>
       </section>
       {/* RIGHT */}
