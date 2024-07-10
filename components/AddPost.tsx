@@ -3,11 +3,14 @@
 import Image from "next/image";
 import { useState } from "react";
 import { MdAddPhotoAlternate } from "react-icons/md";
-import { uploadPost } from "@/lib/actions";
+import { getUploadUrl, uploadPost } from "@/lib/actions";
+import { useFormState } from "react-dom";
 
 const AddPost = () => {
   const [preview, setPreview] = useState("");
-  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploadUrl, setUploadUrl] = useState("");
+  const [photoId, setPhotoId] = useState("");
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
     } = e;
@@ -15,7 +18,38 @@ const AddPost = () => {
     const file = files[0];
     const url = URL.createObjectURL(file);
     setPreview(url);
+    const { success, result } = await getUploadUrl();
+    if (success) {
+      const { id, uploadURL } = result;
+      setUploadUrl(uploadURL);
+      setPhotoId(id);
+    }
   };
+
+  const interceptAction = async (_: any, formData: FormData) => {
+    // upload image to cloudflare
+    const file = formData.get("photo");
+    if (!file) {
+      return;
+    }
+    const cloudfloreForm = new FormData();
+    cloudfloreForm.append("file", file);
+    const response = await fetch(uploadUrl, {
+      method: "POST",
+      body: cloudfloreForm,
+    });
+    if (response.status !== 200) {
+      return;
+    }
+    const photoUrl = `https://imagedelivery.net/aftWKlzuslfUHtBxHBEzVw/${photoId}`;
+    formData.set("photo", photoUrl);
+    return uploadPost(_, formData);
+    // replace photo in formData
+
+    // call upload product.
+  };
+
+  const [state, action] = useFormState(interceptAction, null);
   return (
     <div className="p-4 bg-white shadow-md rounded-lg flex gap-4 justify-between">
       {/* AVATAR */}
@@ -29,7 +63,7 @@ const AddPost = () => {
       {/* POST */}
       <div className="flex-1">
         {/* TEXT INPUT */}
-        <form action={uploadPost} className="flex gap-4">
+        <form action={action} className="flex gap-4">
           <textarea
             name="desc"
             placeholder="게시물을 입력해주세요!"
@@ -56,6 +90,7 @@ const AddPost = () => {
           </div>
           <button>send</button>
         </form>
+        {preview && <div>Preview</div>}
       </div>
     </div>
   );
