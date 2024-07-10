@@ -2,6 +2,8 @@ import Link from "next/link";
 import ProfileCard from "./ProfileCard";
 import Image from "next/image";
 import Ad from "./Ad";
+import { Suspense } from "react";
+import ProfileCardSkeleton from "./ProfileCardSkeleton";
 
 interface LeftMenuProps {
   type: "home" | "profile";
@@ -10,7 +12,11 @@ interface LeftMenuProps {
 const LeftMenu = ({ type }: LeftMenuProps) => {
   return (
     <div className="flex flex-col gap-8">
-      {type === "home" && <ProfileCard />}
+      {type === "home" && (
+        <Suspense fallback={<ProfileCardSkeleton />}>
+          <ProfileCard />
+        </Suspense>
+      )}
       <div className="p-4 bg-white rounded-lg shadow-md text-md text-sm text-slate-500 flex flex-col gap-2">
         <Link
           href="/"

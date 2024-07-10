@@ -2,14 +2,21 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { MdAddPhotoAlternate } from "react-icons/md";
 import { getUploadUrl, uploadPost } from "@/lib/actions";
 import { useFormState } from "react-dom";
+
+import { IoMdClose } from "react-icons/io";
+import { MdAddPhotoAlternate } from "react-icons/md";
 
 const AddPost = () => {
   const [preview, setPreview] = useState("");
   const [uploadUrl, setUploadUrl] = useState("");
   const [photoId, setPhotoId] = useState("");
+
+  const clearImage = () => {
+    setPreview("");
+  };
+
   const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
@@ -90,7 +97,17 @@ const AddPost = () => {
           </div>
           <button>send</button>
         </form>
-        {preview && <div>Preview</div>}
+        {preview && (
+          <div className="relative aspect-square size-40 mt-4">
+            <Image src={preview} alt="" fill />
+            <IoMdClose
+              color="red"
+              className="absolute top-0 right-1"
+              size={24}
+              onClick={clearImage}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

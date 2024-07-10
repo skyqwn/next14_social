@@ -32,6 +32,7 @@ const PostDetail = async ({ params }: { params: { id: string } }) => {
         <Image
           className="object-cover rounded-md"
           fill
+          alt={post.id + ""}
           src={`${post.img}/public`}
         />
       </div>

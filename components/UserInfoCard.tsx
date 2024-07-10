@@ -10,7 +10,12 @@ interface UserInfoCardProps {
   userId: string;
 }
 
-const UserInfoCard = ({ userId }: UserInfoCardProps) => {
+async function getLoading() {
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+}
+
+const UserInfoCard = async ({ userId }: UserInfoCardProps) => {
+  const test = await getLoading();
   return (
     <div className="p-4 bg-white rounded-lg shadow-md text-md text-sm flex flex-col gap-4">
       <div className="flex justify-between items-center font-medium">
