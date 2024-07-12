@@ -5,14 +5,44 @@ import { FaRegCommentDots } from "react-icons/fa6";
 import { IoShareOutline } from "react-icons/io5";
 import Comments from "./Comments";
 
-const Post = () => {
+interface PostProps {
+  post: {
+    user: {
+      id: string;
+      username: string;
+      avatar: string | null;
+      cover: string | null;
+      name: string | null;
+      surname: string | null;
+      description: string | null;
+      city: string | null;
+      school: string | null;
+      work: string | null;
+      website: string | null;
+      createdAt: Date;
+    };
+    id: number;
+    desc: string;
+    img: string | null;
+    createdAt: Date;
+  };
+}
+
+const Post = ({ post }: PostProps) => {
+  console.log(post);
   return (
     <div className="flex flex-col gap-4">
       {/* USER */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="size-10 rounded-full bg-gray-500" />
-          <span className="font-medium">Henry Ford</span>
+          <Image
+            src={post.user.avatar || "/noAvatar.png"}
+            width={40}
+            height={40}
+            alt={post.user.username}
+            className="rounded-full size-10"
+          />
+          <span className="font-medium">{post.user.username}</span>
         </div>
         <IoIosMore />
       </div>
@@ -20,18 +50,13 @@ const Post = () => {
       <div className="flex flex-col gap-4">
         <div className="w-full min-h-96 relative">
           <Image
-            src="https://images.pexels.com/photos/21352835/pexels-photo-21352835.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load"
+            src={`${post.img}/public`}
             alt=""
             fill
             className="object-cover rounded-md"
           />
         </div>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem
-          illo vitae assumenda sequi, animi corrupti sapiente. Provident maxime
-          impedit tempora nulla ut vel cupiditate veritatis reprehenderit eum
-          quos, velit saepe?
-        </p>
+        <p>{post.desc}</p>
       </div>
       {/* INTERACTION */}
       <div className="flex items-center justify-between text-sm my-4">

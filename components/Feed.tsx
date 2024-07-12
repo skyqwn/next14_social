@@ -1,19 +1,32 @@
-import Post from "./Post";
+import prisma from "@/lib/client";
+import { Prisma } from "@prisma/client";
+import PostList from "./PostList";
 
-const Feed = () => {
+async function getInitialPosts() {
+  const posts = await prisma.post.findMany({
+    select: {
+      desc: true,
+      createdAt: true,
+      id: true,
+      user: true,
+      img: true,
+    },
+    take: 1,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return posts;
+}
+
+export type InitialPosts = Prisma.PromiseReturnType<typeof getInitialPosts>;
+
+const Feed = async () => {
+  const initialPosts = await getInitialPosts();
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md flex flex-col gap-12">
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-    </div>
+    <>
+      <PostList initialPosts={initialPosts} />
+    </>
   );
 };
 

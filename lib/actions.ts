@@ -52,3 +52,21 @@ export async function getUploadUrl() {
   const data = await response.json();
   return data;
 }
+
+export async function getMorePosts(page: number) {
+  const posts = await prisma.post.findMany({
+    select: {
+      desc: true,
+      createdAt: true,
+      id: true,
+      user: true,
+      img: true,
+    },
+    skip: page * 1,
+    take: 1,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return posts;
+}

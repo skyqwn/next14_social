@@ -12,7 +12,7 @@ export default function Home() {
       </section>
       <section className="w-full lg:w-[70%] xl:w-[50%]">
         <div className="flex flex-col gap-6">
-          <Stories />
+          {/* <Stories /> */}
           <AddPost />
           <Feed />
         </div>
