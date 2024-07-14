@@ -4,6 +4,7 @@ import z from "zod";
 import prisma from "./client";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 
 const postSchema = z.object({
   photo: z.string(),
@@ -61,6 +62,12 @@ export async function getMorePosts(page: number) {
       id: true,
       user: true,
       img: true,
+      _count: {
+        select: {
+          comments: true,
+          likes: true,
+        },
+      },
     },
     skip: page * 1,
     take: 1,
@@ -70,3 +77,51 @@ export async function getMorePosts(page: number) {
   });
   return posts;
 }
+
+export const likePost = async (postId: number) => {
+  await new Promise((r) => setTimeout(r, 5000));
+  const { userId } = auth();
+  try {
+    await prisma.like.create({
+      data: {
+        postId,
+        userId: userId!,
+      },
+    });
+    revalidateTag(`like-status-${postId}`);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const dislikePost = async (postId: number) => {
+  await new Promise((r) => setTimeout(r, 5000));
+  const { userId } = auth();
+  try {
+    await prisma.like.delete({
+      where: {
+        id: {
+          postId,
+          userId: userId!,
+        },
+      },
+    });
+    revalidateTag(`like-status-${postId}`);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getIsLiked = async (postId: number) => {
+  const { userId } = auth();
+  if (!userId) return;
+  const like = await prisma.like.findUnique({
+    where: {
+      id: {
+        postId,
+        userId,
+      },
+    },
+  });
+  return Boolean(like);
+};

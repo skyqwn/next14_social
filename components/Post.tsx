@@ -1,37 +1,28 @@
 import Image from "next/image";
 import { IoIosMore } from "react-icons/io";
-import { FaRegThumbsUp } from "react-icons/fa";
-import { FaRegCommentDots } from "react-icons/fa6";
-import { IoShareOutline } from "react-icons/io5";
+
 import Comments from "./Comments";
+import { User } from "@prisma/client";
+import PostInteraction from "./PostInteraction";
+import Link from "next/link";
 
 interface PostProps {
   post: {
-    user: {
-      id: string;
-      username: string;
-      avatar: string | null;
-      cover: string | null;
-      name: string | null;
-      surname: string | null;
-      description: string | null;
-      city: string | null;
-      school: string | null;
-      work: string | null;
-      website: string | null;
-      createdAt: Date;
-    };
+    user: User;
     id: number;
     desc: string;
     img: string | null;
+    _count: {
+      likes: number;
+      comments: number;
+    };
     createdAt: Date;
   };
 }
 
 const Post = ({ post }: PostProps) => {
-  console.log(post);
   return (
-    <div className="flex flex-col gap-4">
+    <Link href={`/posts/${post.id}`} className="flex flex-col gap-4 border-b ">
       {/* USER */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -47,7 +38,7 @@ const Post = ({ post }: PostProps) => {
         <IoIosMore />
       </div>
       {/* DESC*/}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mb-4">
         <div className="w-full min-h-96 relative">
           <Image
             src={`${post.img}/public`}
@@ -59,35 +50,9 @@ const Post = ({ post }: PostProps) => {
         <p>{post.desc}</p>
       </div>
       {/* INTERACTION */}
-      <div className="flex items-center justify-between text-sm my-4">
-        <div className="flex gap-8">
-          <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
-            <FaRegThumbsUp size={20} className="cursor-pointer" />
-            <span className="text-slate-300">|</span>
-            <span className="text-slate-500">
-              500<span className="hidden md:inline"> Likes</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
-            <FaRegCommentDots size={20} className="cursor-pointer" />
-            <span className="text-slate-300">|</span>
-            <span className="text-slate-500">
-              98<span className="hidden md:inline"> Comments</span>
-            </span>
-          </div>
-        </div>
-        <div className="">
-          <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
-            <IoShareOutline size={20} className="cursor-pointer" />
-            <span className="text-slate-300">|</span>
-            <span className="text-slate-500">
-              98<span className="hidden md:inline"> Shares</span>
-            </span>
-          </div>
-        </div>
-      </div>
-      <Comments />
-    </div>
+      {/* <PostInteraction postId={post.id} /> */}
+      {/* <Comments /> */}
+    </Link>
   );
 };
 
