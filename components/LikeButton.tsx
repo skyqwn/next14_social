@@ -3,6 +3,7 @@
 import { dislikePost, likePost } from "@/lib/actions";
 import { useOptimistic } from "react";
 import { FaRegThumbsUp } from "react-icons/fa";
+import { FaThumbsUp } from "react-icons/fa";
 
 interface LikeButtonProps {
   isLiked: boolean;
@@ -38,7 +39,11 @@ const LikeButton = ({ isLiked, likeCount, postId }: LikeButtonProps) => {
         className="flex items-center gap-4  p-2 rounded-xl"
       >
         <div className="flex gap-2">
-          <FaRegThumbsUp size={20} className="cursor-pointer" />
+          {state.isLiked ? (
+            <FaThumbsUp size={20} className="cursor-pointer text-blue-500" />
+          ) : (
+            <FaRegThumbsUp size={20} className="cursor-pointer" />
+          )}
           <span className="text-slate-300">|</span>
           <div className="text-slate-500">
             {state.likeCount}
