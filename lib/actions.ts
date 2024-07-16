@@ -5,15 +5,9 @@ import prisma from "./client";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { revalidateTag } from "next/cache";
+import { postSchema } from "@/types/schema";
 
-const postSchema = z.object({
-  photo: z.string(),
-  desc: z.string({
-    required_error: "설명을 입력해주세요!",
-  }),
-});
-
-export async function uploadPost(_: any, formData: FormData) {
+export async function uploadPost(formData: FormData) {
   // const data = Object.fromEntries(formData);
   const data = { photo: formData.get("photo"), desc: formData.get("desc") };
 
@@ -35,6 +29,7 @@ export async function uploadPost(_: any, formData: FormData) {
         id: true,
       },
     });
+    revalidateTag("home-post");
     return redirect(`/posts/${post.id}`);
   }
 }
@@ -79,7 +74,6 @@ export async function getMorePosts(page: number) {
 }
 
 export const likePost = async (postId: number) => {
-  await new Promise((r) => setTimeout(r, 5000));
   const { userId } = auth();
   try {
     await prisma.like.create({
@@ -95,7 +89,6 @@ export const likePost = async (postId: number) => {
 };
 
 export const dislikePost = async (postId: number) => {
-  await new Promise((r) => setTimeout(r, 5000));
   const { userId } = auth();
   try {
     await prisma.like.delete({
@@ -114,7 +107,7 @@ export const dislikePost = async (postId: number) => {
 
 export const getIsLiked = async (postId: number) => {
   const { userId } = auth();
-  if (!userId) return;
+  if (!userId) throw new Error("User is not authenticated!");
   const like = await prisma.like.findUnique({
     where: {
       id: {
@@ -124,4 +117,35 @@ export const getIsLiked = async (postId: number) => {
     },
   });
   return Boolean(like);
+};
+
+export const createComment = async (postId: number, desc: string) => {
+  const { userId } = auth();
+  try {
+    if (!userId) throw new Error("User is not authenticated!");
+
+    const comment = await prisma.comment.create({
+      data: {
+        postId,
+        desc,
+        userId,
+      },
+      select: {
+        user: true,
+        id: true,
+        desc: true,
+        createdAt: true,
+        _count: {
+          select: {
+            likes: true,
+          },
+        },
+      },
+    });
+    revalidateTag(`comment-${postId}`);
+    return comment;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something went Wrong!");
+  }
 };

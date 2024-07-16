@@ -22,6 +22,7 @@ const LikeButton = ({ isLiked, likeCount, postId }: LikeButtonProps) => {
       };
     }
   );
+
   const onClick = async () => {
     reducerFn("");
     if (isLiked) {
@@ -31,10 +32,10 @@ const LikeButton = ({ isLiked, likeCount, postId }: LikeButtonProps) => {
     }
   };
   return (
-    <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
+    <div className="flex items-center gap-4 p-2 rounded-xl border">
       <button
         onClick={onClick}
-        className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl"
+        className="flex items-center gap-4  p-2 rounded-xl"
       >
         <div className="flex gap-2">
           <FaRegThumbsUp size={20} className="cursor-pointer" />

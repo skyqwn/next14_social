@@ -1,7 +1,7 @@
 import { FaRegSmileWink, FaRegThumbsUp } from "react-icons/fa";
 import { IoIosMore } from "react-icons/io";
 
-const Comments = () => {
+const Comment = () => {
   return (
     <div>
       {/* WRITE */}
@@ -48,4 +48,4 @@ const Comments = () => {
   );
 };
 
-export default Comments;
+export default Comment;
