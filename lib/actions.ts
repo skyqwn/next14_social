@@ -149,3 +149,71 @@ export const createComment = async (postId: number, desc: string) => {
     throw new Error("Something went Wrong!");
   }
 };
+
+export const getProfileUserInfo = async (username: string) => {
+  const user = await prisma.user.findFirst({
+    where: {
+      username,
+    },
+    include: {
+      _count: {
+        select: {
+          followers: true,
+          followings: true,
+          posts: true,
+        },
+      },
+    },
+  });
+  return user;
+};
+
+// export const createChatRoom = async (userId: string): Promise<void> => {
+//   const { userId: currentUserId } = auth();
+//   if (!currentUserId) return;
+
+//   const existingChatRoom = await prisma.chatRoom.findFirst({
+//     where: {
+//       AND: [
+//         {
+//           users: {
+//             some: {
+//               id: currentUserId,
+//             },
+//           },
+//         },
+//         {
+//           users: {
+//             some: {
+//               id: userId,
+//             },
+//           },
+//         },
+//       ],
+//     },
+//     select: {
+//       id: true,
+//     },
+//   });
+
+//   if (existingChatRoom) {
+//     redirect(`/chats/${existingChatRoom.id}`);
+//   } else {
+//     const room = await prisma.chatRoom.create({
+//       data: {
+//         users: {
+//           connect: [
+//             { id: userId },
+//             {
+//               id: currentUserId,
+//             },
+//           ],
+//         },
+//       },
+//       select: {
+//         id: true,
+//       },
+//     });
+//     redirect(`/chats/${room.id}`);
+//   }
+// };

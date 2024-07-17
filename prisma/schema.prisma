@@ -36,6 +36,8 @@ model User {
   blocks                 Block[]         @relation("BlocksSent")
   blockedBy              Block[]         @relation("BlocksReceived")
   stories                Story[]
+  chat_rooms             ChatRoom[]
+  messages               Message[]
 }
 
 model Post {
@@ -115,4 +117,26 @@ model Story {
   img       String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @unique
+}
+
+model ChatRoom {
+  id    String @id @default(cuid())
+  users User[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  messages   Message[]
+}
+
+model Message {
+  id      Int    @id @default(autoincrement())
+  payload String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  room       ChatRoom @relation(fields: [chatRoomId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+  chatRoomId String
+  userId     String
 }

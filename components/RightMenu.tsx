@@ -5,20 +5,21 @@ import FriendRequest from "./FriendRequest";
 import UserInfoCard from "./UserInfoCard";
 import UserMediaCard from "./UserMediaCard";
 import UserInfoCardSkeleton from "./UserInfoCardSkeleton";
+import { User } from "@prisma/client";
 
 interface RightMenuProps {
-  userId?: string;
+  user?: User;
 }
 
-const RightMenu = ({ userId }: RightMenuProps) => {
+const RightMenu = ({ user }: RightMenuProps) => {
   return (
     <div className="flex flex-col gap-6">
-      {userId ? (
+      {user ? (
         <>
           <Suspense fallback={<UserInfoCardSkeleton />}>
-            <UserInfoCard userId={userId} />
+            <UserInfoCard user={user} />
           </Suspense>
-          <UserMediaCard userId={userId} />
+          <UserMediaCard user={user} />
         </>
       ) : null}
       <FriendRequest />

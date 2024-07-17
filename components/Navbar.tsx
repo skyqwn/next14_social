@@ -18,9 +18,8 @@ import { FaRegUser } from "react-icons/fa6";
 import { IoPeopleOutline } from "react-icons/io5";
 import { AiOutlineMessage } from "react-icons/ai";
 import { IoNotificationsOutline } from "react-icons/io5";
+import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import { CiSearch } from "react-icons/ci";
-
-import { Input } from "./ui/input";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -33,10 +32,10 @@ const Navbar = () => {
         href: "/",
       },
       {
-        icon: <GoHome size={24} />,
-        label: "홈",
-        isActive: pathname === "/",
-        href: "/",
+        icon: <IoChatboxEllipsesOutline size={24} />,
+        label: "채팅",
+        isActive: pathname === "/chats",
+        href: "/chats",
       },
       {
         icon: <GoHome size={24} />,

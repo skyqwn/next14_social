@@ -5,17 +5,66 @@ import { FaSchool } from "react-icons/fa";
 import { FaShoppingBag } from "react-icons/fa";
 import { FaLink } from "react-icons/fa6";
 import { FaRegCalendarAlt } from "react-icons/fa";
+import prisma from "@/lib/client";
+import { User } from "@prisma/client";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 interface UserInfoCardProps {
-  userId: string;
+  user: User;
 }
 
-async function getLoading() {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
-}
+const UserInfoCard = async ({ user }: UserInfoCardProps) => {
+  const createChatRoom = async () => {
+    "use server";
+    const { userId: currentUserId } = auth();
+    if (!currentUserId) return;
 
-const UserInfoCard = async ({ userId }: UserInfoCardProps) => {
-  const test = await getLoading();
+    const existingChatRoom = await prisma.chatRoom.findFirst({
+      where: {
+        AND: [
+          {
+            users: {
+              some: {
+                id: currentUserId,
+              },
+            },
+          },
+          {
+            users: {
+              some: {
+                id: user.id,
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (existingChatRoom) {
+      redirect(`/chats/${existingChatRoom.id}`);
+    } else {
+      const room = await prisma.chatRoom.create({
+        data: {
+          users: {
+            connect: [
+              { id: user.id },
+              {
+                id: currentUserId,
+              },
+            ],
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+      redirect(`/chats/${room.id}`);
+    }
+  };
   return (
     <div className="p-4 bg-white rounded-lg shadow-md text-md text-sm flex flex-col gap-4">
       <div className="flex justify-between items-center font-medium">
@@ -26,8 +75,8 @@ const UserInfoCard = async ({ userId }: UserInfoCardProps) => {
       </div>
       <div className="flex flex-col gap-4 text-gray-500">
         <div className="flex items-center gap-2">
-          <span className="text-xl text-black">Allie Fernandez</span>
-          <span className="text-sm">White</span>
+          <span className="text-xl text-black">{user.username}</span>
+          <span className="text-sm">{user.username}</span>
         </div>
         <p>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates
@@ -69,6 +118,11 @@ const UserInfoCard = async ({ userId }: UserInfoCardProps) => {
         <button className="bg-blue-500 text-white p-2 rounded-xl cursor-pointer">
           Follow
         </button>
+        <form action={createChatRoom}>
+          <button className="bg-blue-500 text-white p-2 rounded-xl cursor-pointer">
+            메시지 보내기
+          </button>
+        </form>
         <span className="text-red-500 self-end text-xs cursor-pointer">
           Block User
         </span>
