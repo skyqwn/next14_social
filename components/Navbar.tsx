@@ -89,20 +89,11 @@ const Navbar = () => {
         </ClerkLoading>
         <ClerkLoaded>
           <SignedIn>
-            <div className="cursor-pointer">
-              <IoPeopleOutline size={24} />
-            </div>
-            <div className="cursor-pointer">
-              <AiOutlineMessage size={24} />
-            </div>
-            <div className="cursor-pointer">
-              <IoNotificationsOutline size={24} />
-            </div>
             <UserButton />
           </SignedIn>
           <SignedOut>
             <div className="flex items-center gap-2 tex-sm">
-              <FaRegUser size={20} />
+              <FaRegUser size={18} />
               <Link href="/sign-in">Login/Register</Link>
             </div>
           </SignedOut>

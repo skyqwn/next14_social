@@ -8,63 +8,46 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import prisma from "@/lib/client";
 import { User } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import UserInfoCardInteraction from "./UserInfoCardInteraction";
+import CreateMessageButton from "./CreateMessageButton";
 
 interface UserInfoCardProps {
   user: User;
 }
 
 const UserInfoCard = async ({ user }: UserInfoCardProps) => {
-  const createChatRoom = async () => {
-    "use server";
-    const { userId: currentUserId } = auth();
-    if (!currentUserId) return;
+  let isUserBlocked = false;
+  let isFollowing = false;
+  let isFollowingSent = false;
 
-    const existingChatRoom = await prisma.chatRoom.findFirst({
+  const { userId: currentUserId } = auth();
+
+  if (currentUserId) {
+    const blockRes = await prisma.block.findFirst({
       where: {
-        AND: [
-          {
-            users: {
-              some: {
-                id: currentUserId,
-              },
-            },
-          },
-          {
-            users: {
-              some: {
-                id: user.id,
-              },
-            },
-          },
-        ],
-      },
-      select: {
-        id: true,
+        blockerId: currentUserId,
+        blockedId: user.id,
       },
     });
+    blockRes ? (isUserBlocked = true) : (isUserBlocked = false);
 
-    if (existingChatRoom) {
-      redirect(`/chats/${existingChatRoom.id}`);
-    } else {
-      const room = await prisma.chatRoom.create({
-        data: {
-          users: {
-            connect: [
-              { id: user.id },
-              {
-                id: currentUserId,
-              },
-            ],
-          },
-        },
-        select: {
-          id: true,
-        },
-      });
-      redirect(`/chats/${room.id}`);
-    }
-  };
+    const followRes = await prisma.follower.findFirst({
+      where: {
+        followerId: currentUserId,
+        followingId: user.id,
+      },
+    });
+    followRes ? (isFollowing = true) : (isFollowing = false);
+
+    const followReq = await prisma.followRequest.findFirst({
+      where: {
+        senderId: currentUserId,
+        receiverId: user.id,
+      },
+    });
+    followReq ? (isFollowingSent = true) : (isFollowingSent = false);
+  }
+
   return (
     <div className="p-4 bg-white rounded-lg shadow-md text-md text-sm flex flex-col gap-4">
       <div className="flex justify-between items-center font-medium">
@@ -78,26 +61,23 @@ const UserInfoCard = async ({ user }: UserInfoCardProps) => {
           <span className="text-xl text-black">{user.username}</span>
           <span className="text-sm">{user.username}</span>
         </div>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates
-          repellat facere ullam consequuntur inventore accusamus .
-        </p>
+        <p>{user.description ?? "자기 소개글을 입력해주세요."}</p>
         <div className="flex items-center gap-2">
           <FaCity />
           <span>
-            Living in <b>Incheon</b>
+            Living in <b>{user.city ?? "정보 없음"}</b>
           </span>
         </div>
         <div className="flex items-center gap-2">
           <FaSchool />
           <span>
-            Went to <b>백석고등학교</b>
+            Went to <b>{user.school ?? "정보 없음"}</b>
           </span>
         </div>
         <div className="flex items-center gap-2">
           <FaShoppingBag />
           <span>
-            Works at <b>Apple Inc.</b>
+            Works at <b>{user.work ?? "정보 없음"}</b>
           </span>
         </div>
         <div className="flex items-center justify-between">
@@ -107,7 +87,7 @@ const UserInfoCard = async ({ user }: UserInfoCardProps) => {
               href={"https://modong.site"}
               className="text-blut-500 font-medium"
             >
-              modong
+              {user.website ?? "정보 없음"}
             </Link>
           </div>
           <div className="flex gap-1 items-center">
@@ -115,17 +95,30 @@ const UserInfoCard = async ({ user }: UserInfoCardProps) => {
             <span>Joined November 2024</span>
           </div>
         </div>
-        <button className="bg-blue-500 text-white p-2 rounded-xl cursor-pointer">
-          Follow
-        </button>
-        <form action={createChatRoom}>
-          <button className="bg-blue-500 text-white p-2 rounded-xl cursor-pointer">
-            메시지 보내기
-          </button>
-        </form>
-        <span className="text-red-500 self-end text-xs cursor-pointer">
-          Block User
-        </span>
+        {/* <UserInfoCardInteraction
+          userId={user.id}
+          currentUserId={currentUserId}
+          isUserBlocked={isUserBlocked}
+          isFollowing={isFollowing}
+          isFollwingSent={isFollwingSent}
+        /> */}
+        {user.id !== currentUserId && (
+          <>
+            <div className="flex flex-col gap-2">
+              <CreateMessageButton
+                userId={user.id}
+                currentUserId={currentUserId!}
+              />
+            </div>
+            <UserInfoCardInteraction
+              currentUserId={currentUserId!}
+              isFollowing={isFollowing}
+              isFollowingSent={isFollowingSent}
+              isUserBlocked={isUserBlocked}
+              userId={user.id}
+            />
+          </>
+        )}
       </div>
     </div>
   );

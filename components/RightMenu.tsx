@@ -19,7 +19,7 @@ const RightMenu = ({ user }: RightMenuProps) => {
           <Suspense fallback={<UserInfoCardSkeleton />}>
             <UserInfoCard user={user} />
           </Suspense>
-          <UserMediaCard user={user} />
+          {/* <UserMediaCard user={user} /> */}
         </>
       ) : null}
       <FriendRequest />

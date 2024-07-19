@@ -3,6 +3,7 @@ import LeftMenu from "@/components/LeftMenu";
 import RightMenu from "@/components/RightMenu";
 import { getProfileUserInfo } from "@/lib/actions";
 import prisma from "@/lib/client";
+import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -10,6 +11,27 @@ const Profile = async ({ params }: { params: { username: string } }) => {
   const username = params.username;
   const user = await getProfileUserInfo(username);
   if (!user) return notFound();
+
+  const { userId: currentUserId } = auth();
+
+  let isBlocked;
+
+  if (currentUserId) {
+    const res = await prisma.block.findFirst({
+      where: {
+        blockerId: user.id,
+        blockedId: currentUserId,
+      },
+    });
+    if (res) {
+      isBlocked = true;
+    } else {
+      isBlocked = false;
+    }
+  }
+
+  if (isBlocked) return notFound();
+
   return (
     <div className="flex gap-6 pt-6">
       <section className="hidden xl:block w-[20%]">

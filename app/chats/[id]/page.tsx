@@ -2,7 +2,7 @@ import ChatMessagesList from "@/components/ChatMessagesList";
 import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
 import { Prisma } from "@prisma/client";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 async function getRoom(id: string) {
   const room = await prisma.chatRoom.findUnique({
@@ -67,7 +67,7 @@ export type InitialChatMessages = Prisma.PromiseReturnType<typeof getMessages>;
 const ChatRoom = async ({ params }: { params: { id: string } }) => {
   const room = await getRoom(params.id);
   const user = await getUserProfile();
-  if (!user) return notFound();
+  if (!user) redirect("/sign-in");
   if (!room) {
     return notFound();
   }

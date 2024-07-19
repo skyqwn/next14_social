@@ -1,8 +1,7 @@
 "use server";
 
-import z from "zod";
 import prisma from "./client";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { revalidateTag } from "next/cache";
 import { postSchema } from "@/types/schema";
@@ -168,52 +167,87 @@ export const getProfileUserInfo = async (username: string) => {
   return user;
 };
 
-// export const createChatRoom = async (userId: string): Promise<void> => {
-//   const { userId: currentUserId } = auth();
-//   if (!currentUserId) return;
+export const switchFollow = async (userId: string) => {
+  const { userId: currentUserId } = auth();
 
-//   const existingChatRoom = await prisma.chatRoom.findFirst({
-//     where: {
-//       AND: [
-//         {
-//           users: {
-//             some: {
-//               id: currentUserId,
-//             },
-//           },
-//         },
-//         {
-//           users: {
-//             some: {
-//               id: userId,
-//             },
-//           },
-//         },
-//       ],
-//     },
-//     select: {
-//       id: true,
-//     },
-//   });
+  if (!currentUserId) {
+    throw new Error("User is not authenticated!");
+  }
 
-//   if (existingChatRoom) {
-//     redirect(`/chats/${existingChatRoom.id}`);
-//   } else {
-//     const room = await prisma.chatRoom.create({
-//       data: {
-//         users: {
-//           connect: [
-//             { id: userId },
-//             {
-//               id: currentUserId,
-//             },
-//           ],
-//         },
-//       },
-//       select: {
-//         id: true,
-//       },
-//     });
-//     redirect(`/chats/${room.id}`);
-//   }
-// };
+  try {
+    const existingFollow = await prisma.follower.findFirst({
+      where: {
+        followerId: currentUserId,
+        followingId: userId,
+      },
+    });
+
+    if (existingFollow) {
+      await prisma.follower.delete({
+        where: {
+          id: existingFollow.id,
+        },
+      });
+    } else {
+      const exitstingFollowRequest = await prisma.followRequest.findFirst({
+        where: {
+          senderId: currentUserId,
+          receiverId: userId,
+        },
+      });
+
+      if (exitstingFollowRequest) {
+        await prisma.followRequest.delete({
+          where: {
+            id: exitstingFollowRequest.id,
+          },
+        });
+      } else {
+        await prisma.followRequest.create({
+          data: {
+            senderId: currentUserId,
+            receiverId: userId,
+          },
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something went wrong!");
+  }
+};
+
+export const switchBlock = async (userId: string) => {
+  const { userId: currentUserId } = auth();
+
+  if (!currentUserId) {
+    throw new Error("User is not authenticated!");
+  }
+
+  try {
+    const existingBlock = await prisma.block.findFirst({
+      where: {
+        blockerId: currentUserId,
+        blockedId: userId,
+      },
+    });
+
+    if (existingBlock) {
+      await prisma.block.delete({
+        where: {
+          id: existingBlock.id,
+        },
+      });
+    } else {
+      await prisma.block.create({
+        data: {
+          blockerId: currentUserId,
+          blockedId: userId,
+        },
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something wrong error!");
+  }
+};

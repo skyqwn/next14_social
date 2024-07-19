@@ -10,10 +10,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IoMdClose } from "react-icons/io";
 import { MdAddPhotoAlternate } from "react-icons/md";
 import { postSchema, PostType } from "@/types/schema";
-import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
+import { useUser } from "@clerk/nextjs";
 
 const AddPost = () => {
+  const { user } = useUser();
   const [preview, setPreview] = useState("");
   const [uploadUrl, setUploadUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -77,7 +78,7 @@ const AddPost = () => {
     <div className="p-4 bg-white shadow-md rounded-lg flex gap-4 justify-between">
       {/* AVATAR */}
       <Image
-        src="https://images.pexels.com/photos/19968907/pexels-photo-19968907.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load"
+        src={user?.imageUrl ?? "/noAvatar.png"}
         width={48}
         height={48}
         alt=""

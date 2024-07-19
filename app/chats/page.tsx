@@ -3,6 +3,7 @@ import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
 import { Prisma } from "@prisma/client";
 import { unstable_cache as next_cache } from "next/cache";
+import { redirect } from "next/navigation";
 
 async function getAllChats(userId: string) {
   const chats = await prisma.chatRoom.findMany({
@@ -47,6 +48,8 @@ export type InitialChatList = Prisma.PromiseReturnType<
 
 const Chats = async () => {
   const { userId } = auth();
+  if (!userId) redirect("/sign-in");
+
   const chats = await getAllChats(userId!);
   return (
     <div className="p-4">

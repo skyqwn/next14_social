@@ -5,7 +5,7 @@ const Birthdays = () => {
   return (
     <div className="p-4 bg-white rounded-lg shadow-md text-md text-sm flex flex-col gap-4">
       <div className="flex justify-between items-center font-medium">
-        <span className="text-gray-500">친구요청</span>
+        <span className="text-gray-500">친구생일</span>
         <Link href={"/"} className="text-blue-500 text-xs">
           모두 보기
         </Link>
@@ -17,7 +17,7 @@ const Birthdays = () => {
         </div>
         <div className="flex gap-3 justify-end">
           <button className="bg-blue-500 text-white text-xs px-2 py-1 rounded-md">
-            축하하기
+            축하메시지
           </button>
         </div>
       </div>
