@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useState } from "react";
 import { getUploadUrl, uploadPost } from "@/lib/actions";
-import { useFormState, useFormStatus } from "react-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -55,12 +54,13 @@ const AddPost = () => {
     if (!file) {
       return;
     }
-    const cloudfloreForm = new FormData();
-    cloudfloreForm.append("file", file);
+    const cloudflareForm = new FormData();
+    cloudflareForm.append("file", file);
     const response = await fetch(uploadUrl, {
       method: "POST",
-      body: cloudfloreForm,
+      body: cloudflareForm,
     });
+    console.log(response);
     if (response.status !== 200) {
       return;
     }

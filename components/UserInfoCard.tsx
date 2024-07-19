@@ -10,6 +10,7 @@ import { User } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
 import UserInfoCardInteraction from "./UserInfoCardInteraction";
 import CreateMessageButton from "./CreateMessageButton";
+import UpdateUser from "./UpdateUser";
 
 interface UserInfoCardProps {
   user: User;
@@ -52,9 +53,7 @@ const UserInfoCard = async ({ user }: UserInfoCardProps) => {
     <div className="p-4 bg-white rounded-lg shadow-md text-md text-sm flex flex-col gap-4">
       <div className="flex justify-between items-center font-medium">
         <span className="text-gray-500">유저 정보</span>
-        <Link href={"/"} className="text-blue-500 text-xs">
-          모두 보기
-        </Link>
+        {currentUserId === user.id ? <UpdateUser user={user} /> : null}
       </div>
       <div className="flex flex-col gap-4 text-gray-500">
         <div className="flex items-center gap-2">
@@ -84,7 +83,7 @@ const UserInfoCard = async ({ user }: UserInfoCardProps) => {
           <div className="flex gap-1 items-center">
             <FaLink />
             <Link
-              href={"https://modong.site"}
+              href={user.website ?? "#"}
               className="text-blut-500 font-medium"
             >
               {user.website ?? "정보 없음"}
@@ -95,13 +94,6 @@ const UserInfoCard = async ({ user }: UserInfoCardProps) => {
             <span>Joined November 2024</span>
           </div>
         </div>
-        {/* <UserInfoCardInteraction
-          userId={user.id}
-          currentUserId={currentUserId}
-          isUserBlocked={isUserBlocked}
-          isFollowing={isFollowing}
-          isFollwingSent={isFollwingSent}
-        /> */}
         {user.id !== currentUserId && (
           <>
             <div className="flex flex-col gap-2">
@@ -111,7 +103,6 @@ const UserInfoCard = async ({ user }: UserInfoCardProps) => {
               />
             </div>
             <UserInfoCardInteraction
-              currentUserId={currentUserId!}
               isFollowing={isFollowing}
               isFollowingSent={isFollowingSent}
               isUserBlocked={isUserBlocked}

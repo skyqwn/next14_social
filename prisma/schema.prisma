@@ -18,8 +18,6 @@ model User {
   username               String          @unique
   avatar                 String?
   cover                  String?
-  name                   String?
-  surname                String?
   description            String?
   city                   String?
   school                 String?

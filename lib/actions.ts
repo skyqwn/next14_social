@@ -164,6 +164,7 @@ export const getProfileUserInfo = async (username: string) => {
       },
     },
   });
+  revalidateTag("profile-user");
   return user;
 };
 
@@ -249,5 +250,104 @@ export const switchBlock = async (userId: string) => {
   } catch (error) {
     console.log(error);
     throw new Error("Something wrong error!");
+  }
+};
+
+export const acceptFollowRequest = async (userId: string) => {
+  const { userId: currentUserId } = auth();
+
+  if (!currentUserId) {
+    throw new Error("User is not authenticated!");
+  }
+
+  try {
+    const existingFollowRequest = await prisma.followRequest.findFirst({
+      where: {
+        senderId: userId,
+        receiverId: currentUserId,
+      },
+    });
+
+    if (existingFollowRequest) {
+      await prisma.followRequest.delete({
+        where: {
+          id: existingFollowRequest.id,
+        },
+      });
+
+      await prisma.follower.create({
+        data: {
+          followerId: userId,
+          followingId: currentUserId,
+        },
+      });
+    }
+    revalidateTag("profile-user");
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something wrong Error!");
+  }
+};
+
+export const declineFollowRequest = async (userId: string) => {
+  const { userId: currentUserId } = auth();
+
+  if (!currentUserId) {
+    throw new Error("User is not authenticated!");
+  }
+
+  try {
+    const existingFollowRequest = await prisma.followRequest.findFirst({
+      where: {
+        senderId: userId,
+        receiverId: currentUserId,
+      },
+    });
+
+    if (existingFollowRequest) {
+      await prisma.followRequest.delete({
+        where: {
+          id: existingFollowRequest.id,
+        },
+      });
+    }
+    revalidateTag("profile-user");
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something wrong Error!");
+  }
+};
+
+export const updateProfile = async (_: any, formData: FormData) => {
+  // const data = {
+  //   cover: formData.get("cover"),
+  //   description: formData.get("description"),
+  //   city: formData.get("city"),
+  //   school: formData.get("school"),
+  //   work: formData.get("work"),
+  //   website: formData.get("website"),
+  // };
+
+  // console.log(data);
+  console.log(formData);
+  const fields = Object.fromEntries(formData);
+
+  const { userId } = auth();
+  if (!userId) {
+    return { success: false, error: true };
+  }
+
+  try {
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: fields,
+    });
+
+    revalidateTag("profile-user");
+    return { success: true, error: false };
+  } catch (error) {
+    return { success: false, error: true };
   }
 };
