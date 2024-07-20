@@ -7,23 +7,32 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 
-const MobileMenu = () => {
+interface MobileMenuProps {
+  username: string;
+}
+
+const MobileMenu = ({ username }: MobileMenuProps) => {
   return (
-    <div className="md:hidden">
+    <div className="md:hidden bg-white">
       <DropdownMenu>
         <DropdownMenuTrigger>
           <div className="text-blue-600">
             <RxHamburgerMenu size={28} />
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>Billing</DropdownMenuItem>
-          <DropdownMenuItem>Team</DropdownMenuItem>
-          <DropdownMenuItem>Subscription</DropdownMenuItem>
+        <DropdownMenuContent className="bg-white">
+          <DropdownMenuLabel>
+            <Link href={`/`}>홈</Link>
+          </DropdownMenuLabel>
+          {/* <DropdownMenuSeparator /> */}
+          <DropdownMenuItem>
+            <Link href={`/profile/${username}`}>내정보</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link href={"/chats"}>채팅</Link>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

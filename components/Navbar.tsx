@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { useUser } from "@clerk/nextjs";
+
 import MobileMenu from "./MobileMenu";
 import { useMemo } from "react";
 import { usePathname } from "next/navigation";
@@ -12,17 +13,19 @@ import {
   ClerkLoading,
   SignedIn,
   SignedOut,
+  useAuth,
   UserButton,
 } from "@clerk/nextjs";
 import { FaRegUser } from "react-icons/fa6";
-import { IoPeopleOutline } from "react-icons/io5";
-import { AiOutlineMessage } from "react-icons/ai";
-import { IoNotificationsOutline } from "react-icons/io5";
+import { AiOutlineProfile } from "react-icons/ai";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
+
 import { CiSearch } from "react-icons/ci";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const { user } = useUser();
+
   const routes = useMemo(() => {
     return [
       {
@@ -38,10 +41,10 @@ const Navbar = () => {
         href: "/chats",
       },
       {
-        icon: <GoHome size={24} />,
-        label: "홈",
-        isActive: pathname === "/",
-        href: "/",
+        icon: <AiOutlineProfile size={24} />,
+        label: "내정보",
+        isActive: pathname === "/profile",
+        href: `/profile/${user?.username}`,
       },
     ];
   }, []);
@@ -56,7 +59,7 @@ const Navbar = () => {
       </section>
       {/* CENTER */}
       <section className="hidden md:flex w-[50%] text-sm items-center justify-between">
-        <div className="flex gap-6 text-gray-600 items-center justify-between">
+        <div className="xl:hidden flex gap-6 text-gray-600 items-center justify-between">
           {routes.map((route) => {
             return (
               <Link href={route.href} key={route.label}>
@@ -73,7 +76,7 @@ const Navbar = () => {
             );
           })}
         </div>
-        <div className="hidden xl:flex p-2 bg-slate-100 items-center rouded-xl">
+        <div className="hidden xl:flex xl:flex-1 p-2 bg-slate-100 items-center rouded-xl justify-between">
           <input
             type="text"
             placeholder="search..."
@@ -98,7 +101,7 @@ const Navbar = () => {
             </div>
           </SignedOut>
         </ClerkLoaded>
-        <MobileMenu />
+        <MobileMenu username={user?.username!} />
       </section>
     </header>
   );

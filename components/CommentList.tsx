@@ -6,6 +6,7 @@ import { useOptimistic, useState } from "react";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { createComment } from "@/lib/actions";
+import CommentLikeButton from "./CommentLikeButton";
 
 interface Comment {
   user: {
@@ -13,8 +14,6 @@ interface Comment {
     username: string;
     avatar: string | null;
     cover: string | null;
-    name: string | null;
-    surname: string | null;
     description: string | null;
     city: string | null;
     school: string | null;
@@ -28,6 +27,7 @@ interface Comment {
   _count: {
     likes: number;
   };
+  likes: { userId: string }[];
 }
 
 interface CommentListProps {
@@ -37,7 +37,6 @@ interface CommentListProps {
 
 const CommentList = ({ initialComments, postId }: CommentListProps) => {
   const { user, isLoaded } = useUser();
-  const userId = user?.id;
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [desc, setDesc] = useState("");
 
@@ -50,8 +49,6 @@ const CommentList = ({ initialComments, postId }: CommentListProps) => {
         username: "Loading...",
         avatar: user.imageUrl || "/noAvatar.png",
         cover: "",
-        name: "",
-        surname: "",
         description: "",
         city: "",
         school: "",
@@ -65,6 +62,11 @@ const CommentList = ({ initialComments, postId }: CommentListProps) => {
       _count: {
         likes: 0,
       },
+      likes: [
+        {
+          userId: "",
+        },
+      ],
     });
     try {
       const newComment = await createComment(postId, desc);
@@ -78,6 +80,7 @@ const CommentList = ({ initialComments, postId }: CommentListProps) => {
     initialComments,
     (prevState, payload: Comment) => [payload, ...prevState]
   );
+
   return (
     <div>
       <div>
@@ -122,16 +125,11 @@ const CommentList = ({ initialComments, postId }: CommentListProps) => {
               <div className="flex flex-col gap-2 flex-1">
                 <span className="font-medium">{comment.user.username}</span>
                 <p>{comment.desc}</p>
-                <div className="flex items-center gap-8 text-xs text-slate-500 mt-2">
-                  <div className="flex items-center gap-4">
-                    <FaRegThumbsUp />
-                    <span className="text-slate-300">|</span>
-                    <span className="text-slate-500">
-                      {comment._count.likes} Likes
-                    </span>
-                  </div>
-                  <div>Reply</div>
-                </div>
+                <CommentLikeButton
+                  commentCount={comment._count.likes}
+                  likes={comment.likes.map((like) => like.userId)}
+                  commentId={comment.id}
+                />
               </div>
               {/* ICON */}
               <IoIosMore size={22} />

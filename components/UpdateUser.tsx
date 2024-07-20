@@ -37,27 +37,28 @@ const UpdateUser = ({ user }: UpdateUserProps) => {
   };
 
   const interceptAction = async (_: any, formData: FormData) => {
-    const file = formData.get("cover");
-    if (!file) {
-      return;
+    const file = formData.get("cover") as File | null;
+    console.log(file);
+
+    if (file && file.size > 0) {
+      const cloudflareForm = new FormData();
+      cloudflareForm.append("file", file);
+
+      const response = await fetch(uploadUrl, {
+        method: "POST",
+        body: cloudflareForm,
+      });
+
+      if (response.status !== 200) {
+        return;
+      }
+      const coverUrl = `https://imagedelivery.net/aftWKlzuslfUHtBxHBEzVw/${imageId}`;
+
+      formData.set("cover", coverUrl);
+    } else {
+      formData.delete("cover");
     }
-    const cloudflareForm = new FormData();
-    cloudflareForm.append("file", file);
 
-    console.log(uploadUrl);
-
-    const response = await fetch(uploadUrl, {
-      method: "POST",
-      body: cloudflareForm,
-    });
-
-    if (response.status !== 200) {
-      return;
-    }
-    const coverUrl = `https://imagedelivery.net/aftWKlzuslfUHtBxHBEzVw/${imageId}`;
-
-    formData.set("cover", coverUrl);
-    setOpen(false);
     return updateProfile(_, formData);
   };
 
@@ -81,7 +82,7 @@ const UpdateUser = ({ user }: UpdateUserProps) => {
             action={action}
             className="p-12 bg-white rounded-lg shadow-md flex flex-col gap-2 w-full md:w-1/2 xl:w-1/3 relative"
           >
-            <h2>프로파일 업데이트</h2>
+            <h2 className="text-2xl">프로파일 업데이트</h2>
             <div className="mt-4 text-xs text-gray-500">
               유저네임 또는 아바타변경은 오른쪽 상단 아이콘을 클릭해주세요.
             </div>
@@ -110,7 +111,6 @@ const UpdateUser = ({ user }: UpdateUserProps) => {
                       id="cover"
                       name="cover"
                       className="hidden"
-                      required
                     />
                   </div>
                 </div>
@@ -178,6 +178,12 @@ const UpdateUser = ({ user }: UpdateUserProps) => {
               </div>
             </div>
             <Button label="업데이트" className="mt-3" />
+            {state?.success && (
+              <span className="text-green-500">프로파일이 수정되었습니다!</span>
+            )}
+            {state?.error && (
+              <span className="text-green-500">프로파일이 실패하였습니다!</span>
+            )}
             <IoMdClose
               size={26}
               className="absolute top-3 right-3 text-lg cursor-pointer text-red-500  hover:text-red-300 transition-colors"

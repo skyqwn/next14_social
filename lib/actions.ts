@@ -5,6 +5,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { revalidateTag } from "next/cache";
 import { postSchema } from "@/types/schema";
+import { z } from "zod";
 
 export async function uploadPost(formData: FormData) {
   // const data = Object.fromEntries(formData);
@@ -72,51 +73,51 @@ export async function getMorePosts(page: number) {
   return posts;
 }
 
-export const likePost = async (postId: number) => {
-  const { userId } = auth();
-  try {
-    await prisma.like.create({
-      data: {
-        postId,
-        userId: userId!,
-      },
-    });
-    revalidateTag(`like-status-${postId}`);
-  } catch (error) {
-    console.log(error);
-  }
-};
+// export const likePost = async (postId: number) => {
+//   const { userId } = auth();
+//   try {
+//     await prisma.like.create({
+//       data: {
+//         postId,
+//         userId: userId!,
+//       },
+//     });
+//     revalidateTag(`like-status-${postId}`);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
-export const dislikePost = async (postId: number) => {
-  const { userId } = auth();
-  try {
-    await prisma.like.delete({
-      where: {
-        id: {
-          postId,
-          userId: userId!,
-        },
-      },
-    });
-    revalidateTag(`like-status-${postId}`);
-  } catch (error) {
-    console.log(error);
-  }
-};
+// export const dislikePost = async (postId: number) => {
+//   const { userId } = auth();
+//   try {
+//     await prisma.like.delete({
+//       where: {
+//         id: {
+//           postId,
+//           userId: userId!,
+//         },
+//       },
+//     });
+//     revalidateTag(`like-status-${postId}`);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
-export const getIsLiked = async (postId: number) => {
-  const { userId } = auth();
-  if (!userId) throw new Error("User is not authenticated!");
-  const like = await prisma.like.findUnique({
-    where: {
-      id: {
-        postId,
-        userId,
-      },
-    },
-  });
-  return Boolean(like);
-};
+// export const getIsLiked = async (postId: number) => {
+//   const { userId } = auth();
+//   if (!userId) throw new Error("User is not authenticated!");
+//   const like = await prisma.like.findUnique({
+//     where: {
+//       id: {
+//         postId,
+//         userId,
+//       },
+//     },
+//   });
+//   return Boolean(like);
+// };
 
 export const createComment = async (postId: number, desc: string) => {
   const { userId } = auth();
@@ -137,6 +138,11 @@ export const createComment = async (postId: number, desc: string) => {
         _count: {
           select: {
             likes: true,
+          },
+        },
+        likes: {
+          select: {
+            userId: true,
           },
         },
       },
@@ -319,18 +325,27 @@ export const declineFollowRequest = async (userId: string) => {
 };
 
 export const updateProfile = async (_: any, formData: FormData) => {
-  // const data = {
-  //   cover: formData.get("cover"),
-  //   description: formData.get("description"),
-  //   city: formData.get("city"),
-  //   school: formData.get("school"),
-  //   work: formData.get("work"),
-  //   website: formData.get("website"),
-  // };
-
-  // console.log(data);
-  console.log(formData);
   const fields = Object.fromEntries(formData);
+  console.log(fields);
+  const filterFields = Object.fromEntries(
+    Object.entries(fields).filter(([_, value]) => value !== "")
+  );
+
+  const Profile = z.object({
+    cover: z.string().optional(),
+    description: z.string().max(100).optional(),
+    city: z.string().optional(),
+    school: z.string().optional(),
+    work: z.string().optional(),
+    website: z.string().optional(),
+  });
+
+  const validatedFields = Profile.safeParse(filterFields);
+
+  if (!validatedFields.success) {
+    console.log(validatedFields.error.flatten().fieldErrors);
+    return { success: false, error: true };
+  }
 
   const { userId } = auth();
   if (!userId) {
@@ -342,7 +357,7 @@ export const updateProfile = async (_: any, formData: FormData) => {
       where: {
         id: userId,
       },
-      data: fields,
+      data: validatedFields.data,
     });
 
     revalidateTag("profile-user");
