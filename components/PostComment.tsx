@@ -41,8 +41,7 @@ async function getCachedComments(postId: number) {
 export type InitialComments = Prisma.PromiseReturnType<typeof getComments>;
 
 const PostComment = async ({ postId }: CommentProps) => {
-  const initialComments = await getComments(postId);
-  console.log(initialComments.map((comment) => comment.likes));
+  const initialComments = await getCachedComments(postId);
   return (
     <>
       <CommentList initialComments={initialComments} postId={postId} />

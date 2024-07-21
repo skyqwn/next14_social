@@ -149,42 +149,6 @@ export async function getMorePosts(page: number) {
 //   return Boolean(like);
 // };
 
-export const createComment = async (postId: number, desc: string) => {
-  const { userId } = auth();
-  try {
-    if (!userId) throw new Error("User is not authenticated!");
-
-    const comment = await prisma.comment.create({
-      data: {
-        postId,
-        desc,
-        userId,
-      },
-      select: {
-        user: true,
-        id: true,
-        desc: true,
-        createdAt: true,
-        _count: {
-          select: {
-            likes: true,
-          },
-        },
-        likes: {
-          select: {
-            userId: true,
-          },
-        },
-      },
-    });
-    revalidateTag(`comment-${postId}`);
-    return comment;
-  } catch (error) {
-    console.log(error);
-    throw new Error("Something went Wrong!");
-  }
-};
-
 export const getProfileUserInfo = async (username: string) => {
   const user = await prisma.user.findFirst({
     where: {

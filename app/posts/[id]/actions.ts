@@ -66,7 +66,7 @@ export const switchPostLike = async (postId: number) => {
   }
 };
 
-export async function switchCommentLike(commentId: number) {
+export async function switchCommentLike(commentId: number, postId: number) {
   const { userId } = auth();
   if (!userId) throw new Error("User is not authenticated!");
 
@@ -92,8 +92,87 @@ export async function switchCommentLike(commentId: number) {
         },
       });
     }
+    revalidateTag(`comment-${postId}`);
   } catch (error) {
     console.log(error);
     throw new Error("Something went Wrong!");
   }
 }
+
+export const createComment = async (postId: number, desc: string) => {
+  const { userId } = auth();
+  try {
+    if (!userId) throw new Error("User is not authenticated!");
+
+    const comment = await prisma.comment.create({
+      data: {
+        postId,
+        desc,
+        userId,
+      },
+      select: {
+        user: true,
+        id: true,
+        desc: true,
+        createdAt: true,
+        _count: {
+          select: {
+            likes: true,
+          },
+        },
+        likes: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+    });
+    revalidateTag(`comment-${postId}`);
+    return comment;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something went Wrong!");
+  }
+};
+
+export const deleteComment = async (commentId: number, postId: number) => {
+  const { userId } = auth();
+  if (!userId) throw new Error("User is not authenticated!");
+
+  try {
+    await prisma.comment.delete({
+      where: {
+        id: commentId,
+        userId,
+      },
+    });
+    revalidateTag(`comment-${postId}`);
+  } catch (error) {
+    console.log(error);
+    throw new Error("someting went Wrong!");
+  }
+};
+
+export const updateComment = async (
+  commentId: number,
+  editDesc: string,
+  postId: number
+) => {
+  const { userId } = auth();
+  if (!userId) throw new Error("User is not authenticated!");
+
+  try {
+    await prisma.comment.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        desc: editDesc,
+      },
+    });
+    revalidateTag(`comment-${postId}`);
+  } catch (error) {
+    console.log(error);
+    throw new Error("someting went Wrong!");
+  }
+};

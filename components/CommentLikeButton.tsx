@@ -9,12 +9,14 @@ interface CommentLikeButtonProps {
   commentCount: number;
   likes: string[];
   commentId: number;
+  postId: number;
 }
 
 const CommentLikeButton = ({
   commentCount,
   commentId,
   likes,
+  postId,
 }: CommentLikeButtonProps) => {
   const { userId } = useAuth();
   const [likeState, setLikeState] = useState({
@@ -37,7 +39,7 @@ const CommentLikeButton = ({
   const likeAction = async () => {
     switchOptimisticLike("");
     try {
-      switchCommentLike(commentId);
+      switchCommentLike(commentId, postId);
       setLikeState((state) => ({
         commentCount: state.isLiked
           ? state.commentCount - 1
