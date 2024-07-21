@@ -1,5 +1,4 @@
 import prisma from "@/lib/client";
-import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { unstable_cache as nextCache, revalidateTag } from "next/cache";
@@ -10,17 +9,9 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import LikeButton from "@/components/LikeButton";
 import PostComment from "@/components/PostComment";
-// import { getCachedLikeStatus } from "./actions";
+import { getIsOwner } from "@/lib/actions";
 dayjs.locale("ko");
 dayjs.extend(relativeTime);
-
-async function getIsOwner(userId: string) {
-  const { userId: currentId } = auth();
-  if (userId) {
-    return currentId === userId;
-  }
-  return false;
-}
 
 async function getPost(id: number) {
   const post = await prisma.post.findUnique({
@@ -88,9 +79,9 @@ const PostDetail = async ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="flex flex-col gap-3 h-[calc(100vh-96px)] p-2 md:h-full">
-      <section className="relative aspect-square  flex-shrink-0">
+      <section className="relative aspect-square flex-shrink-0 ">
         <Image
-          className="object-cover rounded-md  md:justify-center items-center"
+          className="object-cover rounded-md"
           fill
           alt={post.id + ""}
           src={`${post.img}/public`}
@@ -122,7 +113,6 @@ const PostDetail = async ({ params }: { params: { id: string } }) => {
       <section className="flex items-center justify-between text-sm my-4">
         <div className="flex gap-8 ">
           <LikeButton
-            // isLiked={likeStatus?.isLiked!}
             likes={post.likes.map((like) => like.userId)}
             likeCount={post._count.likes}
             postId={id}

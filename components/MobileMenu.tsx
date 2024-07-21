@@ -14,6 +14,7 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ username }: MobileMenuProps) => {
+  console.log(username);
   return (
     <div className="md:hidden bg-white">
       <DropdownMenu>

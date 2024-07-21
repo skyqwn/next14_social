@@ -7,6 +7,36 @@ import { revalidateTag } from "next/cache";
 import { postSchema } from "@/types/schema";
 import { z } from "zod";
 
+export async function getUser() {
+  const { userId } = auth();
+
+  if (!userId) return;
+
+  return await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      username: true,
+      avatar: true,
+      cover: true,
+      _count: {
+        select: {
+          followers: true,
+        },
+      },
+    },
+  });
+}
+
+export async function getIsOwner(userId: string) {
+  const { userId: currentId } = auth();
+  if (userId) {
+    return currentId === userId;
+  }
+  return false;
+}
+
 export async function uploadPost(formData: FormData) {
   // const data = Object.fromEntries(formData);
   const data = { photo: formData.get("photo"), desc: formData.get("desc") };

@@ -1,7 +1,7 @@
 import prisma from "@/lib/client";
 import { Prisma } from "@prisma/client";
 import PostList from "./PostList";
-import { unstable_cache as nextCache, revalidatePath } from "next/cache";
+import { unstable_cache as nextCache } from "next/cache";
 
 const getCachePosts = nextCache(getInitialPosts, ["home-posts"], {
   tags: ["home-post"],

@@ -18,6 +18,11 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        openSans: "var(--openSans-text)",
+        pacifico: "var(--pacifico-text)",
+        roboto: "var(--roboto-text)",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

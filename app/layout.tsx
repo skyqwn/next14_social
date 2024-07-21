@@ -1,10 +1,29 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Open_Sans, Pacifico, Roboto } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 
-const inter = Inter({ subsets: ["latin"] });
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  weight: ["500"],
+  style: ["normal"],
+  variable: "--openSans-text",
+});
+
+const pacifico = Pacifico({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal"],
+  variable: "--pacifico-text",
+});
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal"],
+  variable: "--roboto-text",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -22,7 +41,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${inter.className} bg-slate-100`}>
+        <body
+          className={`${openSans.variable} ${pacifico.variable} ${roboto.variable} bg-slate-100 font-roboto`}
+        >
           <div className="w-full bg-white px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
             <Navbar />
           </div>

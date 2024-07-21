@@ -1,29 +1,6 @@
-import prisma from "@/lib/client";
-import { auth } from "@clerk/nextjs/server";
+import { getUser } from "@/lib/actions";
 import Image from "next/image";
 import Link from "next/link";
-
-async function getUser() {
-  const { userId } = auth();
-
-  if (!userId) return;
-
-  return await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      username: true,
-      avatar: true,
-      cover: true,
-      _count: {
-        select: {
-          followers: true,
-        },
-      },
-    },
-  });
-}
 
 const ProfileCard = async () => {
   const user = await getUser();

@@ -25,7 +25,7 @@ import { CiSearch } from "react-icons/ci";
 const Navbar = () => {
   const pathname = usePathname();
   const { user } = useUser();
-
+  const username = user?.username;
   const routes = useMemo(() => {
     return [
       {
@@ -44,17 +44,17 @@ const Navbar = () => {
         icon: <AiOutlineProfile size={24} />,
         label: "내정보",
         isActive: pathname === "/profile",
-        href: `/profile/${user?.username}`,
+        href: `/profile/${username}`,
       },
     ];
-  }, []);
+  }, [username]);
 
   return (
     <header className="h-24 flex items-center justify-between">
       {/* LEFT */}
       <section className="md:hidden lg:block w-[20%]">
-        <Link href="/" className="font-bold text-xl text-blue-600">
-          NEXT_SOCIAL
+        <Link href="/" className="font-pacifico text-4xl text-blue-600">
+          Next_Social
         </Link>
       </section>
       {/* CENTER */}
@@ -101,7 +101,7 @@ const Navbar = () => {
             </div>
           </SignedOut>
         </ClerkLoaded>
-        <MobileMenu username={user?.username!} />
+        <MobileMenu username={username!} />
       </section>
     </header>
   );
