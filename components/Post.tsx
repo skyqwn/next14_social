@@ -5,7 +5,6 @@ import { User } from "@prisma/client";
 import Link from "next/link";
 import { FaRegThumbsUp } from "react-icons/fa";
 import { FaRegCommentDots } from "react-icons/fa6";
-import { getCachedLikeStatus } from "@/app/posts/[id]/actions";
 
 interface PostProps {
   post: {
