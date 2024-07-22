@@ -42,7 +42,7 @@ const Profile = async ({ params }: { params: { username: string } }) => {
           <div className="flex flex-col items-center justify-center">
             <div className="w-full h-64 relative">
               <Image
-                src={`${user.cover}/public` ?? "/noCover.png"}
+                src={`${user.cover}/public` || "/noCover.png"}
                 alt=""
                 fill
                 className="object-cover rounded-md"

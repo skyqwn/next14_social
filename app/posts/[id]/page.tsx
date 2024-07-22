@@ -53,6 +53,8 @@ async function getPostDesc(id: number) {
   return post;
 }
 
+export const dynamic = "force-dynamic";
+
 const getCachedPost = nextCache(getPost, ["post-detail"], {
   tags: ["post-detail"],
 });

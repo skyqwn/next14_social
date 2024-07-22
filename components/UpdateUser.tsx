@@ -90,7 +90,7 @@ const UpdateUser = ({ user }: UpdateUserProps) => {
               <label htmlFor="">커버 사진</label>
               <div className="flex items-center gap-2 cursor-pointer">
                 <Image
-                  src={`${user.cover}/avatar` ?? "/noCover.png"}
+                  src={`${user.cover}/avatar` || "/noCover.png"}
                   alt=""
                   width={40}
                   height={32}
